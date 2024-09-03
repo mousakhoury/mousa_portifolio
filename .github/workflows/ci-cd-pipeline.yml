@@ -62,9 +62,9 @@ jobs:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
-          lftp -c "
+          lftp -p 21 -c "
           open -u $FTP_USERNAME,$FTP_PASSWORD $FTP_HOST;
           set ssl:verify-certificate no;
-          mirror -R /;
+          mirror -R dist/ ./;
           quit
           "
