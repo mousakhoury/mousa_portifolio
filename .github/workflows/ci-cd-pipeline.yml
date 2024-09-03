@@ -65,6 +65,6 @@ jobs:
           lftp -c "
           open -u $FTP_USERNAME,$FTP_PASSWORD $FTP_HOST;
           set ssl:verify-certificate no;
-          mirror -R dist/ domains/telegram.yalgamers.gg/public_html/;
+          mirror -R /;
           quit
           "
