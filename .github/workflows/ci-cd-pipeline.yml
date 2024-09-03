@@ -41,16 +41,22 @@ jobs:
         with:
           name: dist
 
-      - name: List files after downloading artifact
+      - name: List all files in the current directory
         run: ls -Rla
 
-      - name: Check dist directory
-        run: ls -la dist
+      - name: Check contents of the dist directory
+        run: |
+          if [ -d "dist" ]; then
+            ls -la dist
+          else
+            echo "Directory dist not found."
+          fi
 
       - name: Install lftp
         run: sudo apt-get install -y lftp
 
       - name: Deploy to FTP Server
+        if: success()
         env:
           FTP_HOST: ${{ secrets.FTP_HOST }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
