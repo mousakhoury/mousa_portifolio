@@ -1,0 +1,28 @@
+stages:
+  - build
+  - deploy
+
+build:
+  image: node:latest
+  stage: build
+  script:
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 hour  # Optional: Set expiration time for build artifacts
+
+deploy:
+  image: alpine:latest  # Use a lightweight image for the deployment step
+  stage: deploy
+  before_script:
+    - apk add --no-cache lftp  # Install lftp on the Alpine Linux image
+  script:
+    - ls -la dist  # List files in the dist directory to ensure it exists
+    - lftp -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} -e "set ftp:ssl-allow no; mirror -R dist/ domains/telegram.yalgamers.gg/public_html/; quit" ${{ secrets.FTP_HOST }}
+  dependencies:
+    - build  # Ensure the deploy job uses the build artifacts
+  only:
+    - main
+
