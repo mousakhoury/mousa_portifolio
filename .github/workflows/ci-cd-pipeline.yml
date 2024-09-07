@@ -1,14 +1,13 @@
-name: Deploy React App via SFTP
+name: Build and Deploy React App with LFTP
 
 on:
   push:
     branches:
-      - main # Adjust the branch to trigger the deployment
+      - main # Trigger the deployment on the main branch
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       # Checkout the latest code
       - name: Checkout code
@@ -18,24 +17,32 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "18" # Adjust the Node.js version if needed
+          node-version: "18" # You can adjust this if needed
 
-      # Install dependencies
-      - name: Install dependencies
-        run: npm install
+      # Install dependencies and build the React app
+      - name: Install dependencies and build
+        run: |
+          npm install
+          npm run build
 
-      # Build the React app
-      - name: Build React app
-        run: npm run build
-
-      # Upload the build directory via SFTP
-      - name: Upload via SFTP
-        uses: SamKirkland/FTP-Deploy-Action@4.3.0
+      # Upload the build directory as an artifact (optional)
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v2
         with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: build/ # Add a trailing slash to indicate it's a directory
-          server-dir: / # Remote server path
-          protocol: sftp # Change to SFTP
-          port: 221 # Specify the correct port for SFTP
+          name: build-files
+          path: build/ # Assuming build directory is 'build'
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      # Install LFTP
+      - name: Install LFTP
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y lftp
+
+      # Deploy using LFTP
+      - name: Deploy via LFTP
+        run: |
+          lftp -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} -e "mirror -R -P 4 ./build /; quit" ${{ secrets.FTP_SERVER }}
