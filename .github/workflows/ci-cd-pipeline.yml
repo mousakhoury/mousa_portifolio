@@ -33,8 +33,8 @@ jobs:
         uses: SamKirkland/FTP-Deploy-Action@4.3.0
         with:
           server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USER }}
+          username: ${{ secrets.FTP_USERNAME }} # Updated to match the secret name
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: build
-          server-dir: ${{ secrets.FTP_PATH }}
+          server-dir: / # If the path is directly inside FTP, you can leave it as '/'
           protocol: ftp
