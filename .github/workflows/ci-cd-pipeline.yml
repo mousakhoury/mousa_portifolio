@@ -45,4 +45,4 @@ jobs:
       # Deploy using LFTP
       - name: Deploy via LFTP
         run: |
-          lftp -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} -e "mirror -R -P 4 ./build /; quit" ${{ secrets.FTP_SERVER }}
+          lftp -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} -e "mirror -R -P 4 ./build /; quit" ${{ secrets.FTP_HOST }}
