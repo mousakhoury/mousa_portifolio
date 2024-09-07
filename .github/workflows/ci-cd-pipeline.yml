@@ -1,70 +1,40 @@
-name: CI/CD Pipeline
+name: Deploy React App via FTP
 
 on:
   push:
     branches:
-      - main
+      - main # Adjust the branch to trigger the deployment
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Code
+      # Checkout the latest code
+      - name: Checkout code
         uses: actions/checkout@v2
 
+      # Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "16" # or the version you need
+          node-version: "18" # Adjust the Node.js version if needed
 
-      - name: Install Dependencies
+      # Install dependencies
+      - name: Install dependencies
         run: npm install
 
-      - name: Build Project
+      # Build the React app
+      - name: Build React app
         run: npm run build
 
-      - name: List files after build
-        run: ls -la
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v2
+      # Upload the build directory via FTP
+      - name: Upload via FTP
+        uses: SamKirkland/FTP-Deploy-Action@4.3.0
         with:
-          name: dist
-          path: dist/
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Download Artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: dist
-
-      - name: List all files in the current directory
-        run: ls -Rla
-
-      - name: Check contents of the dist directory
-        run: |
-          if [ -d "dist" ]; then
-            ls -la dist
-          else
-            echo "Directory dist not found."
-          fi
-
-      - name: Install lftp
-        run: sudo apt-get install -y lftp
-
-      - name: Deploy to FTP Server
-        if: success()
-        env:
-          FTP_HOST: ${{ secrets.FTP_HOST }}
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-        run: |
-          lftp -p 21 -c "
-          open -u $FTP_USERNAME,$FTP_PASSWORD $FTP_HOST;
-          set ssl:verify-certificate no;
-          mirror -R dist/ ./;
-          quit
-          "
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: build
+          server-dir: ${{ secrets.FTP_PATH }}
+          protocol: ftp
