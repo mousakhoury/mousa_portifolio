@@ -1,4 +1,4 @@
-name: Deploy React App via FTP
+name: Deploy React App via SFTP
 
 on:
   push:
@@ -28,13 +28,14 @@ jobs:
       - name: Build React app
         run: npm run build
 
-      # Upload the build directory via FTP
-      - name: Upload via FTP
+      # Upload the build directory via SFTP
+      - name: Upload via SFTP
         uses: SamKirkland/FTP-Deploy-Action@4.3.0
         with:
           server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USERNAME }} # Updated to match the secret name
+          username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: build
-          server-dir: / # If the path is directly inside FTP, you can leave it as '/'
-          protocol: ftp
+          local-dir: build/ # Add a trailing slash to indicate it's a directory
+          server-dir: / # Remote server path
+          protocol: sftp # Change to SFTP
+          port: 221 # Specify the correct port for SFTP
