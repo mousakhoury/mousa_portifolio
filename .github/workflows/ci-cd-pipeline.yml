@@ -64,6 +64,6 @@ jobs:
           lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" ${{ secrets.FTP_HOST }} <<-EOF
             set ssl:verify-certificate no
             set ftp:passive-mode on
-            mirror -R --overwrite -P 4 ./${{ env.BUILD_DIR }} /path/to/your/remote/directory/
+            mirror -R --overwrite -P 4 ./${{ env.BUILD_DIR }} /
             quit
           EOF
