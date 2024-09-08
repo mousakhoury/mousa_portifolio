@@ -51,7 +51,7 @@ jobs:
       # Debug: List remote directories with hidden files
       - name: List remote directories with hidden files
         run: |
-          lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" ${{ secrets.FTP_HOST }} <<-EOF
+          lftp -u "4240241_mousa,${{ secrets.FTP_PASSWORD }}" mousakhoury.c1.biz <<-EOF
             set ssl:verify-certificate no
             set ftp:passive-mode on
             ls -a /
@@ -61,7 +61,7 @@ jobs:
       # Deploy using LFTP to the root directory
       - name: Deploy via LFTP
         run: |
-          lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" ${{ secrets.FTP_HOST }} <<-EOF
+          lftp -u "4240241_mousa,${{ secrets.FTP_PASSWORD }}" mousakhoury.c1.biz <<-EOF
             set ssl:verify-certificate no
             mirror -R --overwrite -P 4 ./${{ env.BUILD_DIR }} /
             quit
