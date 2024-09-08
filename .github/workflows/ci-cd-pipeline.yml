@@ -52,6 +52,7 @@ jobs:
       - name: Deploy via LFTP
         run: |
           lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" ${{ secrets.FTP_HOST }} <<-EOF
+            set ssl:verify-certificate no  # Disable SSL certificate verification
             mirror -R -P 4 ./${{ env.BUILD_DIR }} /
             quit
           EOF
