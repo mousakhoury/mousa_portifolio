@@ -1,34 +1,30 @@
 on: push
 name: 🚀 Deploy website on push
-
 jobs:
   web-deploy:
     name: 🎉 Deploy
     runs-on: ubuntu-latest
-
     steps:
       - name: 🚚 Get latest code
         uses: actions/checkout@v2
 
-      - name: Use Node.js 18
+      - name: Use Node.js 14
         uses: actions/setup-node@v2
         with:
-          node-version: "18" # Use Node.js 18 as per your previous workflow
+          node-version: "14"
 
       - name: 🔨 Build Project
         run: |
           npm install
           npm run build
 
-      # Optional: List output files to check the build directory
       - name: List output files
         run: find build/ -print
 
-      # FTP Deploy
       - name: 📂 Sync files
         uses: SamKirkland/FTP-Deploy-Action@4.2.0
         with:
-          server: ${{ secrets.FTP_HOST }} # Your FTP server address
-          username: ${{ secrets.FTP_USERNAME }} # FTP username stored in GitHub secrets
-          password: ${{ secrets.FTP_PASSWORD }} # FTP password stored in GitHub secrets
-          local-dir: build/ # The directory where your project is built
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: build/
