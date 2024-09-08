@@ -48,11 +48,11 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y lftp
 
-      # Deploy using LFTP, force overwriting files
+      # Deploy using LFTP, overwrite files without deleting
       - name: Deploy via LFTP
         run: |
           lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" ${{ secrets.FTP_HOST }} <<-EOF
             set ssl:verify-certificate no
-            mirror -R --overwrite --delete -P 4 ./${{ env.BUILD_DIR }} /
+            mirror -R --overwrite -P 4 ./${{ env.BUILD_DIR }} /
             quit
           EOF
