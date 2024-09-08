@@ -48,17 +48,17 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y lftp
 
-      # Debug: List remote directories with hidden files
-      - name: List remote directories with hidden files
+      # Delete all files from the remote server
+      - name: Delete all files on the remote server
         run: |
           lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" ${{ secrets.FTP_HOST }} <<-EOF
             set ssl:verify-certificate no
             set ftp:passive-mode on
-            ls -a /
+            rm -r /
             quit
           EOF
 
-      # Deploy using LFTP to the root directory
+      # Deploy using LFTP after deletion
       - name: Deploy via LFTP
         run: |
           lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" ${{ secrets.FTP_HOST }} <<-EOF
