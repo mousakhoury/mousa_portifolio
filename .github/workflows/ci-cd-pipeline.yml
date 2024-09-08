@@ -48,11 +48,22 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y lftp
 
+      # Debug: List remote directories to find where to upload files
+      - name: List remote directories
+        run: |
+          lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" ${{ secrets.FTP_HOST }} <<-EOF
+            set ssl:verify-certificate no
+            set ftp:passive-mode on
+            ls /
+            quit
+          EOF
+
       # Deploy using LFTP, overwrite files without deleting
       - name: Deploy via LFTP
         run: |
           lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" ${{ secrets.FTP_HOST }} <<-EOF
             set ssl:verify-certificate no
-            mirror -R --overwrite -P 4 ./${{ env.BUILD_DIR }} /
+            set ftp:passive-mode on
+            mirror -R --overwrite -P 4 ./${{ env.BUILD_DIR }} /path/to/your/remote/directory/
             quit
           EOF
