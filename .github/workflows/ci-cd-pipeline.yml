@@ -25,6 +25,10 @@ jobs:
           npm install
           npm run build
 
+      # Ensure build directory exists (debugging step)
+      - name: List build directory
+        run: ls -la ./build
+
   deploy:
     runs-on: ubuntu-latest
     needs: build
@@ -35,10 +39,14 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y lftp
 
+      # Ensure that the working directory is correct
+      - name: Ensure Working Directory
+        run: pwd # Check the current working directory
+
       # Deploy using LFTP
       - name: Deploy via LFTP
         run: |
-          lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" ${{ secrets.FTP_SERVER }} <<-EOF
+          lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" ${{ secrets.FTP_HOST }} <<-EOF
             mirror -R -P 4 ./build /
             quit
           EOF
