@@ -1,58 +1,34 @@
-name: Build and Deploy React App with LFTP
-
-on:
-  push:
-    branches:
-      - main # Trigger the deployment on the main branch
+on: push
+name: 🚀 Deploy website on push
 
 jobs:
-  build:
+  web-deploy:
+    name: 🎉 Deploy
     runs-on: ubuntu-latest
+
     steps:
-      # Checkout the latest code
-      - name: Checkout code
+      - name: 🚚 Get latest code
         uses: actions/checkout@v2
 
-      # Set up Node.js
-      - name: Set up Node.js
+      - name: Use Node.js 18
         uses: actions/setup-node@v2
         with:
-          node-version: "18"
+          node-version: "18" # Use Node.js 18 as per your previous workflow
 
-      # Install dependencies and build the React app
-      - name: Install dependencies and build
+      - name: 🔨 Build Project
         run: |
           npm install
           npm run build
 
-      # List directory contents after build to find the generated folder
-      - name: Find build folder
-        id: find-build
-        run: |
-          if [ -d "build" ]; then
-            echo "BUILD_DIR=build" >> $GITHUB_ENV
-          elif [ -d "dist" ]; then
-            echo "BUILD_DIR=dist" >> $GITHUB_ENV
-          else
-            echo "No known build directory found."
-            exit 1
-          fi
+      # Optional: List output files to check the build directory
+      - name: List output files
+        run: find build/ -print
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      # Install LFTP
-      - name: Install LFTP
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y lftp
-
-      # Deploy using LFTP, overwrite files without deleting
-      - name: Deploy via LFTP
-        run: |
-          lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" ${{ secrets.FTP_HOST }} <<-EOF
-            set ssl:verify-certificate no
-            mirror -R --overwrite -P 4 ./${{ env.BUILD_DIR }} /
-            quit
-          EOF
+      # FTP Deploy
+      - name: 📂 Sync files
+        uses: SamKirkland/FTP-Deploy-Action@4.2.0
+        with:
+          server: ${{ secrets.FTP_HOST }} # Your FTP server address
+          username: ${{ secrets.FTP_USERNAME }} # FTP username stored in GitHub secrets
+          password: ${{ secrets.FTP_PASSWORD }} # FTP password stored in GitHub secrets
+          local-dir: build/ # The directory where your project is built
