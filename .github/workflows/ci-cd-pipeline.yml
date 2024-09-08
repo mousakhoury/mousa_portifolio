@@ -25,9 +25,13 @@ jobs:
           npm install
           npm run build
 
-      # Ensure build directory exists (debugging step)
-      - name: List build directory
-        run: ls -la ./build
+      # Debug: List current directory contents after build
+      - name: List current directory contents
+        run: ls -la
+
+      # Debug: Check if build folder exists
+      - name: List build directory if exists
+        run: ls -la build || echo "No build directory found"
 
   deploy:
     runs-on: ubuntu-latest
@@ -38,10 +42,6 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install -y lftp
-
-      # Ensure that the working directory is correct
-      - name: Ensure Working Directory
-        run: pwd # Check the current working directory
 
       # Deploy using LFTP
       - name: Deploy via LFTP
