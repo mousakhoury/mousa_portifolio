@@ -48,11 +48,11 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y lftp
 
-      # Deploy using LFTP, dynamically using the found build folder
+      # Deploy using LFTP, force overwriting files
       - name: Deploy via LFTP
         run: |
           lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" ${{ secrets.FTP_HOST }} <<-EOF
-            set ssl:verify-certificate no  # Disable SSL certificate verification
-            mirror -R -P 4 ./${{ env.BUILD_DIR }} /
+            set ssl:verify-certificate no
+            mirror -R --overwrite --delete -P 4 ./${{ env.BUILD_DIR }} /
             quit
           EOF
